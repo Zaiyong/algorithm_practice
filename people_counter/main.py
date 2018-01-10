@@ -92,6 +92,7 @@ while(cap.isOpened()):
     # RETR_EXTERNAL returns only extreme outer flags. All child contours are left behind.
     _, contours0, hierarchy = cv2.findContours(mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
     for cnt in contours0:
+        cv2.drawContours(frame, cnt, -1, (0,255,0), 3, 8)
         area = cv2.contourArea(cnt)
         if area > areaTH:
             #################
@@ -133,10 +134,11 @@ while(cap.isOpened()):
                     p = Person.Person(pid,cx,cy, max_p_age)
                     persons.append(p)
                     pid += 1
-            #################
-            #   DIBUJOS     #
-            #################
+
+            # plot the red dot
             cv2.circle(frame,(cx,cy), 5, (0,0,255), -1)
+
+            # plot the gren rectangle around person
             img = cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),2)
             #cv2.drawContours(frame, cnt, -1, (0,255,0), 3)
 
