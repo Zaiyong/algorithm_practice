@@ -21,9 +21,6 @@ print ('Area Threshold', areaTH)
 line_up = int(2*(h/5))
 line_down   = int(3*(h/5))
 
-up_limit =   int(1*(h/5))
-down_limit = int(4*(h/5))
-
 print ("Red line y:",str(line_down))
 print ("Blue line y:", str(line_up))
 line_down_color = (255,0,0)
@@ -37,14 +34,6 @@ pt4 =  [w, line_up];
 pts_L2 = np.array([pt3,pt4], np.int32)
 pts_L2 = pts_L2.reshape((-1,1,2))
 
-pt5 =  [0, up_limit];
-pt6 =  [w, up_limit];
-pts_L3 = np.array([pt5,pt6], np.int32)
-pts_L3 = pts_L3.reshape((-1,1,2))
-pt7 =  [0, down_limit];
-pt8 =  [w, down_limit];
-pts_L4 = np.array([pt7,pt8], np.int32)
-pts_L4 = pts_L4.reshape((-1,1,2))
 
 #background
 fgbg = cv2.createBackgroundSubtractorMOG2(detectShadows = True)
@@ -128,8 +117,6 @@ while(cap.isOpened()):
     str_down = 'DOWN: '+ str(cnt_down)
     frame = cv2.polylines(frame,[pts_L1],False,line_down_color,thickness=2)
     frame = cv2.polylines(frame,[pts_L2],False,line_up_color,thickness=2)
-    frame = cv2.polylines(frame,[pts_L3],False,(255,255,255),thickness=1)
-    frame = cv2.polylines(frame,[pts_L4],False,(255,255,255),thickness=1)
     cv2.putText(frame, str_up ,(10,40),font,0.5,(255,255,255),2,cv2.LINE_AA)
     cv2.putText(frame, str_up ,(10,40),font,0.5,(0,0,255),1,cv2.LINE_AA)
     cv2.putText(frame, str_down ,(10,90),font,0.5,(255,255,255),2,cv2.LINE_AA)
