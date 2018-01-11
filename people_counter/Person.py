@@ -3,7 +3,7 @@ import time
 
 class Person:
     tracks = []
-    def __init__(self, i, xi, yi, max_age):
+    def __init__(self, i, xi, yi):
         self.i = i
         self.x = xi
         self.y = yi
@@ -12,9 +12,6 @@ class Person:
         self.G = randint(0,255)
         self.B = randint(0,255)
         self.done = False
-        self.state = '0'
-        self.age = 0
-        self.max_age = max_age
         self.dir = None
     def getRGB(self):
         return (self.R,self.G,self.B)
@@ -22,8 +19,6 @@ class Person:
         return self.tracks
     def getId(self):
         return self.i
-    def getState(self):
-        return self.state
     def getDir(self):
         return self.dir
     def getX(self):
@@ -31,7 +26,6 @@ class Person:
     def getY(self):
         return self.y
     def updateCoords(self, xn, yn):
-        self.age = 0
         self.tracks.append([self.x,self.y])
         self.x = xn
         self.y = yn
@@ -41,31 +35,18 @@ class Person:
         return self.done
     def going_UP(self,line_up):
         if len(self.tracks) >= 2:
-            if self.state == '0':
-                if self.tracks[-1][1] < line_up and self.tracks[-2][1] >= line_up: #cross the line_up
-                    state = '1'
-                    self.dir = 'up'
-                    return True
-            else:
-                return False
-        else:
-            return False
+            if self.tracks[-1][1] < line_up and self.tracks[-2][1] >= line_up: #cross the line_up
+                self.dir = 'up'
+                return True
+        return False
+
     def going_DOWN(self,line_down):
         if len(self.tracks) >= 2:
-            if self.state == '0':
-                if self.tracks[-1][1] > line_down and self.tracks[-2][1] <= line_down: #cross the line_down
-                    state = '1'
-                    self.dir = 'down'
-                    return True
-            else:
-                return False
-        else:
-            return False
-    def age_one(self):
-        self.age += 1
-        if self.age > self.max_age:
-            self.done = True
-        return True
+            if self.tracks[-1][1] > line_down and self.tracks[-2][1] <= line_down: #cross the line_down
+                self.dir = 'down'
+                return True
+        return False
+
 #
 # class MultiPerson:
 #     def __init__(self, persons, xi, yi):
