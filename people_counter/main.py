@@ -113,7 +113,7 @@ while(cap.isOpened()):
                         # el objeto esta cerca de uno que ya se detecto antes
                         new = False
                         i.updateCoords(cx,cy)   #actualiza coordenadas en el objeto and resets age
-                        if i.going_UP(line_down,line_up) == True:
+                        if i.going_UP(line_up) == True:
                             cnt_up += 1;
                             print ("ID:",i.getId(),'crossed going up at',time.strftime("%c"))
                         elif i.going_DOWN(line_down,line_up) == True:
