@@ -3,7 +3,6 @@ import cv2
 import Person
 import time
 
-
 cnt_up   = 0
 cnt_down = 0
 
@@ -58,22 +57,13 @@ kernelCl = np.ones((11,11),np.uint8)
 #Variables
 font = cv2.FONT_HERSHEY_SIMPLEX # set the font value
 persons = []
-max_p_age = 5
 pid = 1
 
 while(cap.isOpened()):
 ##for image in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
     #Lee una imagen de la fuente de video
     ret, frame = cap.read()
-##    frame = image.array
 
-    for i in persons:
-        i.age_one() #age every person one frame
-    #########################
-    #   PRE-PROCESAMIENTO   #
-    #########################
-
-    #Aplica substraccion de fondo
     fgmask = fgbg.apply(frame)
 
     #Binariazcion para eliminar sombras (color gris)
@@ -95,50 +85,39 @@ while(cap.isOpened()):
         cv2.drawContours(frame, cnt, -1, (0,255,0), 3, 8)
         area = cv2.contourArea(cnt)
         if area > areaTH:
-            #################
-            #   TRACKING    #
-            #################
-
-            #Falta agregar condiciones para multipersonas, salidas y entradas de pantalla.
-
             M = cv2.moments(cnt)
+            # Centroid of the moment: cx,cy
             cx = int(M['m10']/M['m00'])
             cy = int(M['m01']/M['m00'])
+
+            # genearete the coordinates of top-left vertex and the size of the rectangle
             x,y,w,h = cv2.boundingRect(cnt)
 
             new = True
-            if cy in range(up_limit,down_limit):
-                for i in persons:
-                    if abs(cx-i.getX()) <= w and abs(cy-i.getY()) <= h:
-                        # el objeto esta cerca de uno que ya se detecto antes
-                        new = False
-                        i.updateCoords(cx,cy)   #actualiza coordenadas en el objeto and resets age
-                        if i.going_UP(line_up) == True:
-                            cnt_up += 1;
-                            print ("ID:",i.getId(),'crossed going up at',time.strftime("%c"))
-                        elif i.going_DOWN(line_down,line_up) == True:
-                            cnt_down += 1;
-                            print ("ID:",i.getId(),'crossed going down at',time.strftime("%c"))
-                        break
-                    if i.getState() == '1':
-                        if i.getDir() == 'down' and i.getY() > down_limit:
-                            i.setDone()
-                        elif i.getDir() == 'up' and i.getY() < up_limit:
-                            i.setDone()
-                    if i.timedOut():
-                        #sacar i de la lista persons
-                        index = persons.index(i)
-                        persons.pop(index)
-                        del i     #liberar la memoria de i
-                if new == True:
-                    p = Person.Person(pid,cx,cy, max_p_age)
-                    persons.append(p)
-                    pid += 1
+            for i in persons:
+                if abs(cx-i.getX()) <= w and abs(cy-i.getY()) <= h:
+                    # this is not a new person
+                    new = False
+                    i.updateCoords(cx,cy)
+                    if i.going_UP(line_up) == True:
+                        cnt_up += 1;
+                        i.setDone()
+                        print ("ID:",i.getId(),'crossed going up at',time.strftime("%c"))
+                    elif i.going_DOWN(line_down) == True:
+                        cnt_down += 1;
+                        i.setDone()
+                        print ("ID:",i.getId(),'crossed going down at',time.strftime("%c"))
+                    break
+
+            if new == True:
+                p = Person.Person(pid,cx,cy)
+                persons.append(p)
+                pid += 1
 
             # plot the red dot
             cv2.circle(frame,(cx,cy), 5, (0,0,255), -1)
 
-            # plot the gren rectangle around person
+            # plot the green rectangle around person
             img = cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),2)
             #cv2.drawContours(frame, cnt, -1, (0,255,0), 3)
 
