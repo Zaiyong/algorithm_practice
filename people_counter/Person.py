@@ -33,17 +33,17 @@ class Person:
         self.done = True
     def timedOut(self):
         return self.done
-    def going_UP(self,line_up):
+    def goingLeft(self,line_left):
         if len(self.tracks) >= 2:
-            if self.tracks[-1][1] < line_up and self.tracks[-2][1] >= line_up: #cross the line_up
-                self.dir = 'up'
+            if self.tracks[-1][0] < line_left and self.tracks[-2][0] >= line_left: #cross the line_up
+                self.dir = 'left'
                 return True
         return False
 
-    def going_DOWN(self,line_down):
+    def goingRight(self,line_right):
         if len(self.tracks) >= 2:
-            if self.tracks[-1][1] > line_down and self.tracks[-2][1] <= line_down: #cross the line_down
-                self.dir = 'down'
+            if self.tracks[-1][0] > line_right and self.tracks[-2][0] <= line_right: #cross the line_down
+                self.dir = 'right'
                 return True
         return False
 

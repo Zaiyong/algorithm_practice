@@ -3,11 +3,13 @@ import cv2
 import Person
 import time
 
-cnt_up   = 0
-cnt_down = 0
+cnt_left   = 0
+cnt_right = 0
 
 # read the video
-cap = cv2.VideoCapture('peopleCounter.mov')
+# cap = cv2.VideoCapture('peopleCounter_rotate.mov')
+cap = cv2.VideoCapture(0)
+
 
 # weight, height
 w = cap.get(3)
@@ -18,21 +20,24 @@ areaTH = frameArea/250
 print ('Area Threshold', areaTH)
 
 #genearete the coordinates of the 4 lines
-line_up = int(2*(h/5))
-line_down   = int(3*(h/5))
+line_left = int(2*(w/5))
+line_right   = int(3*(w/5))
 
-print ("Red line y:",str(line_down))
-print ("Blue line y:", str(line_up))
-line_down_color = (255,0,0)
-line_up_color = (0,0,255)
-pt1 =  [0, line_down];
-pt2 =  [w, line_down];
-pts_L1 = np.array([pt1,pt2], np.int32)
-pts_L1 = pts_L1.reshape((-1,1,2))
-pt3 =  [0, line_up];
-pt4 =  [w, line_up];
-pts_L2 = np.array([pt3,pt4], np.int32)
-pts_L2 = pts_L2.reshape((-1,1,2))
+print ("Red line y:",str(line_left))
+
+line_left_color = (255,0,0)
+pt1_left =  [line_left,0];
+pt2_left =  [line_left,h];
+pts_left = np.array([pt1_left,pt2_left], np.int32)
+pts_left = pts_left.reshape((-1,1,2))
+
+
+print ("Blue line y:", str(line_right))
+line_right_color = (0,0,255)
+pt1_right =  [line_right,0];
+pt2_right =  [line_right,h];
+pts_right = np.array([pt1_right,pt2_right], np.int32)
+pts_right = pts_right.reshape((-1,1,2))
 
 
 #background
@@ -52,7 +57,7 @@ while(cap.isOpened()):
 ##for image in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
     #Lee una imagen de la fuente de video
     ret, frame = cap.read()
-
+    # frame=cv2.flip(frame, 0)
     fgmask = fgbg.apply(frame)
 
     #Binariazcion para eliminar sombras (color gris)
@@ -64,14 +69,14 @@ while(cap.isOpened()):
         mask =  cv2.morphologyEx(mask , cv2.MORPH_CLOSE, kernelCl)
     except:
         print('EOF')
-        print ('UP:',cnt_up)
-        print ('DOWN:',cnt_down)
+        print ('UP:',cnt_left)
+        print ('DOWN:',cnt_right)
         break
 
     # RETR_EXTERNAL returns only extreme outer flags. All child contours are left behind.
     _, contours0, hierarchy = cv2.findContours(mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
     for cnt in contours0:
-        cv2.drawContours(frame, cnt, -1, (0,255,0), 3, 8)
+        # cv2.drawContours(frame, cnt, -1, (0,255,0), 3, 8)
         area = cv2.contourArea(cnt)
         if area > areaTH:
             M = cv2.moments(cnt)
@@ -88,14 +93,14 @@ while(cap.isOpened()):
                     # this is not a new person
                     new = False
                     i.updateCoords(cx,cy)
-                    if i.going_UP(line_up) == True:
-                        cnt_up += 1;
+                    if i.goingRight(line_right) == True:
+                        cnt_right += 1;
                         i.setDone()
-                        print ("ID:",i.getId(),'crossed going up at',time.strftime("%c"))
-                    elif i.going_DOWN(line_down) == True:
-                        cnt_down += 1;
+                        print ("ID:",i.getId(),'crossed going left at',time.strftime("%c"))
+                    elif i.goingLeft(line_left) == True:
+                        cnt_left += 1;
                         i.setDone()
-                        print ("ID:",i.getId(),'crossed going down at',time.strftime("%c"))
+                        print ("ID:",i.getId(),'crossed going right at',time.strftime("%c"))
                     break
 
             if new == True:
@@ -113,14 +118,14 @@ while(cap.isOpened()):
     for i in persons:
         cv2.putText(frame, str(i.getId()),(i.getX(),i.getY()),font,0.3,i.getRGB(),1,cv2.LINE_AA)
 
-    str_up = 'UP: '+ str(cnt_up)
-    str_down = 'DOWN: '+ str(cnt_down)
-    frame = cv2.polylines(frame,[pts_L1],False,line_down_color,thickness=2)
-    frame = cv2.polylines(frame,[pts_L2],False,line_up_color,thickness=2)
-    cv2.putText(frame, str_up ,(10,40),font,0.5,(255,255,255),2,cv2.LINE_AA)
-    cv2.putText(frame, str_up ,(10,40),font,0.5,(0,0,255),1,cv2.LINE_AA)
-    cv2.putText(frame, str_down ,(10,90),font,0.5,(255,255,255),2,cv2.LINE_AA)
-    cv2.putText(frame, str_down ,(10,90),font,0.5,(255,0,0),1,cv2.LINE_AA)
+    str_left = 'LEFT: '+ str(cnt_left)
+    str_right = 'RIGHT: '+ str(cnt_right)
+    frame = cv2.polylines(frame,[pts_left],False,line_left_color,thickness=2)
+    frame = cv2.polylines(frame,[pts_right],False,line_right_color,thickness=2)
+    cv2.putText(frame, str_left ,(10,40),font,0.5,(255,255,255),2,cv2.LINE_AA)
+    cv2.putText(frame, str_left ,(10,40),font,0.5,(255,0,0),1,cv2.LINE_AA)
+    cv2.putText(frame, str_right ,(10,90),font,0.5,(255,255,255),2,cv2.LINE_AA)
+    cv2.putText(frame, str_right ,(10,90),font,0.5,(0,0,255),1,cv2.LINE_AA)
 
     cv2.imshow('Frame',frame)
 
