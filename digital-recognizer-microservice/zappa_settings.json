@@ -1,0 +1,10 @@
+{
+    "dev": {
+        "app_function": "my_app.app",
+        "aws_region": null,
+        "profile_name": "zaiyong-private",
+        "project_name": "handwriting-mic",
+        "runtime": "python3.6",
+        "s3_bucket": "zappa-bil021x2j"
+    }
+}
